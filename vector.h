@@ -1,7 +1,3 @@
-//
-//  tamarasvector.h
-//  
-//
 //  Created by Tamara on 07.08.25.
 //
 #ifndef VECTOR_H
@@ -37,9 +33,9 @@ private:
     void realloc(size_type bigger) {
         pointer new_values = new value_type[bigger];
         for (size_type i = 0; i < sz; i++) {
-            new_values[i] = values[i]; // pointer verbiegen vl effizienter, aber kommt es auf speed an?
+            new_values[i] = values[i]; // maybe do sth about this
         }
-        delete[] values; // ja das brauche ich
+        delete[] values;
         max_sz = bigger;
         values = new_values;
     }
@@ -197,8 +193,6 @@ public:
         return iterator{values + current, values + sz};
     }
     
-    // class in class starts now
-    
     class Iterator {
     public:
         using value_type = Vector::value_type;
@@ -311,8 +305,6 @@ public:
             return old_ref;
         }
         
-        //Damit insert and erase so funktionieren, muss auch die folgende Methode implementiert werden:
-        
         friend Vector:: difference_type operator-( const Vector::ConstIterator& lop, const Vector::ConstIterator& rop ) {
             return lop.ptr-rop.ptr;
         }
@@ -324,4 +316,4 @@ std::ostream& operator<<(std::ostream& o, const Vector<T>& v) {
     return v.print(o);
 }
 
-#endif /* tamarasvector_h */
+#endif
