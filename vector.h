@@ -1,9 +1,5 @@
 //Created by Tamara on 07.08.25.
 
-
-// strongly secure changelog:
-// made final touches on 7th november 18:00
-
 #ifndef VECTOR_H
 #define VECTOR_H
 #include <iostream>
@@ -225,10 +221,10 @@ public:
             /* if (!owner || !owner->values ||
                 ptr < owner->values || ptr >= owner->values + owner->sz)
                 throw std::runtime_error("Invalid iterator dereference"); */
-            if (!owner)
+            if (owner == nullptr)
                 throw std::runtime_error("Invalid iterator dereference: owner is null");
 
-            if (!owner->values)
+            if (owner->values == nullptr)
                 throw std::runtime_error("Invalid iterator dereference: owner->values is null");
 
             if (ptr < owner->values)
@@ -243,13 +239,10 @@ public:
         }
 
         pointer operator->() const {
-            /*if (!owner || !owner->values ||
-                ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator reference");*/
-            if (!owner)
+            if (owner == nullptr)
                 throw std::runtime_error("Invalid iterator reference: owner is null");
 
-            if (!owner->values)
+            if (owner->values == nullptr)
                 throw std::runtime_error("Invalid iterator reference: owner->values is null");
 
             if (ptr < owner->values)
@@ -273,8 +266,13 @@ public:
         
         
         iterator& operator++() {
-            if (ptr != endptr) {
-                ++ptr;
+            if (owner) {
+                if (ptr < owner->values || ptr > owner->values + owner->sz) {
+                    return *this;
+                }
+                if (ptr != endptr) {
+                    ++ptr;
+                }
             }
             return *this;
         }
@@ -314,18 +312,15 @@ public:
         
         
         const_reference operator*() const {
-           /* if (!owner || !owner->values ||
-                ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator dereference");*/
-            if (!owner)
+            if (owner == nullptr)
                 throw std::runtime_error("Invalid iterator dereference: owner is null");
-
-            if (!owner->values)
+            
+            if (owner->values == nullptr)
                 throw std::runtime_error("Invalid iterator dereference: owner->values is null");
-
+            
             if (ptr < owner->values)
                 throw std::runtime_error("Invalid iterator dereference: ptr before start");
-
+            
             if (ptr >= owner->values + owner->sz)
                 throw std::runtime_error("Invalid iterator dereference: ptr past end");
             
@@ -334,21 +329,18 @@ public:
                 throw std::runtime_error("This is the end. Nothing to dereference here.");
             return *ptr; // this statement would be enough for secure
         }
-
+        
         pointer operator->() const {
-            /*if (!owner || !owner->values ||
-                ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator reference");*/
             
-            if (!owner)
+            if (owner == nullptr)
                 throw std::runtime_error("Invalid iterator reference: owner is null");
-
-            if (!owner->values)
+            
+            if (owner->values == nullptr)
                 throw std::runtime_error("Invalid iterator reference: owner->values is null");
-
+            
             if (ptr < owner->values)
                 throw std::runtime_error("Invalid iterator reference: ptr before start");
-
+            
             if (ptr >= owner->values + owner->sz)
                 throw std::runtime_error("Invalid iterator reference: ptr past end");
             
@@ -358,9 +350,10 @@ public:
             return ptr; // this statement would be enough for secure
         }
         
+        
+        
         bool operator==(const ConstIterator& it) const {
-            std::cout << "first value " << ptr << " second value " << it.ptr << std::endl;;
-            return (owner == it.owner && ptr == it.ptr && endptr == it.endptr);
+            return (ptr == it.ptr);
         }
 
         bool operator!=(const ConstIterator& it) const {
@@ -368,8 +361,13 @@ public:
         }
         
         const_iterator& operator++() {
-            if (ptr != endptr) {
-                ++ptr;
+            if (owner) {
+                if (ptr < owner->values || ptr > owner->values + owner->sz) {
+                    return *this;
+                }
+                if (ptr != endptr) {
+                    ++ptr;
+                }
             }
             return *this;
         }
