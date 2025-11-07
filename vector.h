@@ -1,9 +1,9 @@
-//  fuer strongly secure: eine Instanzvariable auf den vector und pruefen, ob vector noch das ist, was erwartet wird. So wird er strongly secure.
-//
-//
-//
-//  Created by Tamara on 07.08.25.
-//
+//Created by Tamara on 07.08.25.
+
+
+// strongly secure changelog:
+// made final touches on 7th november 18:00
+
 #ifndef VECTOR_H
 #define VECTOR_H
 #include <iostream>
@@ -152,28 +152,28 @@ public:
             return iterator{nullptr};
         }
         return iterator{values, values + sz, this};
-    }
+    } // iterator returns have to include the vector now to be strongly secure
     
     iterator end() {
         if (!values) {
             return iterator{nullptr};
         }
         return iterator{values+sz, values+sz, this};
-    }
+    } // iterator returns have to include the vector now to be strongly secure
     
     const_iterator begin() const {
         if (!values) {
             return const_iterator{nullptr, nullptr};
         }
         return const_iterator{values, values+sz, this};
-    }
+    } // iterator returns have to include the vector now to be strongly secure
     
     const_iterator end() const {
         if (!values) {
             return const_iterator{nullptr, nullptr};
         }
         return const_iterator{values+sz, values+sz, this};
-    }
+    } // iterator returns have to include the vector now to be strongly secure
     
     iterator insert(const_iterator pos, const_reference val) {
         auto diff = pos - begin();
@@ -186,8 +186,8 @@ public:
             values[i + 1] = values[i];
         values[current] = val;
         ++sz;
-        return iterator{values + current, values + sz};
-    }
+        return iterator{values + current, values + sz, this};
+    } // iterator returns have to include the vector now to be strongly secure
     
     iterator erase(const_iterator pos) {
         auto diff = pos - begin();
@@ -197,8 +197,8 @@ public:
         for (auto i{current}; i < sz - 1; ++i)
             values[i] = values[i + 1];
         --sz;
-        return iterator{values + current, values + sz};
-    }
+        return iterator{values + current, values + sz, this};
+    } // iterator returns have to include the vector now to be strongly secure
     
     // class in class starts now
     
@@ -221,43 +221,47 @@ public:
         Iterator(pointer ptr, pointer endptr): ptr{ptr}, endptr{endptr}, owner{nullptr} {}
         Iterator(pointer ptr, pointer endptr, const Vector* owner): ptr{ptr}, endptr{endptr}, owner{owner} {}
         
-       /* reference operator*() const {
-            if (ptr == endptr) {
-                throw std::out_of_range("This is the end. Nothing to dereference here.");
-            }
-            return *ptr;
-        }
-        
-        pointer operator->() const {
-            if (ptr == endptr) {
-                throw std::out_of_range("This is the end. Nothing to reference here.");
-            }
-            return ptr;
-        } */
-        
-        
-        
-        
         reference operator*() const {
-            if (!owner || !owner->values ||
+            /* if (!owner || !owner->values ||
                 ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator dereference");
+                throw std::runtime_error("Invalid iterator dereference"); */
+            if (!owner)
+                throw std::runtime_error("Invalid iterator dereference: owner is null");
+
+            if (!owner->values)
+                throw std::runtime_error("Invalid iterator dereference: owner->values is null");
+
+            if (ptr < owner->values)
+                throw std::runtime_error("Invalid iterator dereference: ptr before start");
+
+            if (ptr >= owner->values + owner->sz)
+                throw std::runtime_error("Invalid iterator dereference: ptr past end");
+            
             if (ptr == endptr)
                 throw std::out_of_range("This is the end. Nothing to dereference here.");
-            return *ptr;
+            return *ptr; // this statement would be enough for secure
         }
 
         pointer operator->() const {
-            if (!owner || !owner->values ||
+            /*if (!owner || !owner->values ||
                 ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator reference");
+                throw std::runtime_error("Invalid iterator reference");*/
+            if (!owner)
+                throw std::runtime_error("Invalid iterator reference: owner is null");
+
+            if (!owner->values)
+                throw std::runtime_error("Invalid iterator reference: owner->values is null");
+
+            if (ptr < owner->values)
+                throw std::runtime_error("Invalid iterator reference: ptr before start");
+
+            if (ptr >= owner->values + owner->sz)
+                throw std::runtime_error("Invalid iterator reference: ptr past end");
+            
             if (ptr == endptr)
                 throw std::out_of_range("This is the end. Nothing to reference here.");
-            return ptr;
+            return ptr; // this statement would be enough for secure
         }
-        
-        
-        
         
         bool operator==(const const_iterator& it) const {
             return static_cast<const_iterator>(*this) == it;
@@ -308,43 +312,55 @@ public:
         ConstIterator(pointer ptr, pointer endptr): ptr{ptr}, endptr{endptr}, owner{nullptr} {}
         ConstIterator(pointer ptr, pointer endptr, const Vector* owner): ptr{ptr}, endptr{endptr}, owner{owner} {}
         
-       /* const_reference operator*() const {
-            if (ptr == endptr) {
-                throw std::runtime_error{"This is the end. Nothing to dereference here."};
-            }
-            return *ptr;
-        }
-        
-        pointer operator->() const {
-            if (ptr == endptr) {
-                throw std::runtime_error{"This is the end. Nothing to reference here."};
-            }
-            return ptr;
-        } */
         
         const_reference operator*() const {
-            if (!owner || !owner->values ||
+           /* if (!owner || !owner->values ||
                 ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator dereference");
+                throw std::runtime_error("Invalid iterator dereference");*/
+            if (!owner)
+                throw std::runtime_error("Invalid iterator dereference: owner is null");
+
+            if (!owner->values)
+                throw std::runtime_error("Invalid iterator dereference: owner->values is null");
+
+            if (ptr < owner->values)
+                throw std::runtime_error("Invalid iterator dereference: ptr before start");
+
+            if (ptr >= owner->values + owner->sz)
+                throw std::runtime_error("Invalid iterator dereference: ptr past end");
+            
+            
             if (ptr == endptr)
                 throw std::runtime_error("This is the end. Nothing to dereference here.");
-            return *ptr;
+            return *ptr; // this statement would be enough for secure
         }
 
         pointer operator->() const {
-            if (!owner || !owner->values ||
+            /*if (!owner || !owner->values ||
                 ptr < owner->values || ptr >= owner->values + owner->sz)
-                throw std::runtime_error("Invalid iterator reference");
+                throw std::runtime_error("Invalid iterator reference");*/
+            
+            if (!owner)
+                throw std::runtime_error("Invalid iterator reference: owner is null");
+
+            if (!owner->values)
+                throw std::runtime_error("Invalid iterator reference: owner->values is null");
+
+            if (ptr < owner->values)
+                throw std::runtime_error("Invalid iterator reference: ptr before start");
+
+            if (ptr >= owner->values + owner->sz)
+                throw std::runtime_error("Invalid iterator reference: ptr past end");
+            
+            
             if (ptr == endptr)
                 throw std::runtime_error("This is the end. Nothing to reference here.");
-            return ptr;
+            return ptr; // this statement would be enough for secure
         }
         
-        
-        
-        
         bool operator==(const ConstIterator& it) const {
-            return ptr == it.ptr && owner == it.owner;
+            std::cout << "first value " << ptr << " second value " << it.ptr << std::endl;;
+            return (owner == it.owner && ptr == it.ptr && endptr == it.endptr);
         }
 
         bool operator!=(const ConstIterator& it) const {
