@@ -45,8 +45,8 @@ public:
     Vector(): sz{0}, max_sz{0}, values{nullptr} {}
     
     Vector(size_type max_sz): sz{0}, max_sz{max_sz}, values{new value_type[max_sz]} {
-        if (max_sz < 0)
-            max_sz = 0;
+        //if (max_sz < 0)
+          //  max_sz = 0;
         }
     
     Vector(std::initializer_list<value_type> ilist): Vector(ilist.size()) {
@@ -267,7 +267,7 @@ public:
         
         iterator& operator++() {
             if (owner) {
-                if (ptr < owner->values || ptr > owner->values + owner->sz) {
+                if (ptr < owner->values || ptr >= owner->values + owner->sz) {
                     return *this;
                 }
                 if (ptr != endptr) {
@@ -362,7 +362,7 @@ public:
         
         const_iterator& operator++() {
             if (owner) {
-                if (ptr < owner->values || ptr > owner->values + owner->sz) {
+                if (ptr < owner->values || ptr >= owner->values + owner->sz) {
                     return *this;
                 }
                 if (ptr != endptr) {
