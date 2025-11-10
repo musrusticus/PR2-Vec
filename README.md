@@ -1,3 +1,3 @@
 funky little vector class
 
-WIP
+passes secure and strongly secure tests
