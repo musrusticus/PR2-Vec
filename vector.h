@@ -309,7 +309,15 @@ public:
         
         ConstIterator(pointer ptr, pointer endptr): ptr{ptr}, endptr{endptr}, owner{nullptr} {}
         ConstIterator(pointer ptr, pointer endptr, const Vector* owner): ptr{ptr}, endptr{endptr}, owner{owner} {}
+        // test if cock == hard
         
+        bool is_end() const {
+          if(ptr == nullptr) return true;
+          if(endptr == nullptr) return true;
+          if(owner == nullptr) return true;
+          if(owner->values == nullptr) return true;
+          return !((ptr >= owner->values) && (ptr < owner->values + owner->sz) && (ptr < endptr));
+        }
         
         const_reference operator*() const {
             if (owner == nullptr)
@@ -352,8 +360,14 @@ public:
         
         
         
-        bool operator==(const ConstIterator& it) const {
+        /*bool operator==(const ConstIterator& it) const {
             return (ptr == it.ptr);
+        }*/
+        
+        bool operator==(const ConstIterator& it) const {
+          if(is_end() && it.is_end()) return true;
+          if(is_end() != it.is_end()) return false;
+          return ptr == it.ptr;
         }
 
         bool operator!=(const ConstIterator& it) const {
